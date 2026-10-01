@@ -10,6 +10,29 @@
   let wantsPlayback = false;
   let failed = false;
   let previousVolume = RADIO_CONFIG.initialVolume;
+  let selectedVolume = previousVolume;
+  let muted = false;
+  let audioContext;
+  let outputGain;
+
+  const applyVolume = () => {
+    // iOS ignores HTMLMediaElement.volume; control the existing audio's signal.
+    audio.volume = outputGain ? 1 : selectedVolume;
+    audio.muted = muted;
+    if (outputGain) outputGain.gain.value = muted ? 0 : selectedVolume;
+  };
+  const prepareOutput = () => {
+    const Context = window.AudioContext || window.webkitAudioContext;
+    if (!Context) return;
+    if (!audioContext) {
+      audioContext = new Context();
+      outputGain = audioContext.createGain();
+      audioContext.createMediaElementSource(audio).connect(outputGain);
+      outputGain.connect(audioContext.destination);
+      applyVolume();
+    }
+    return audioContext.resume();
+  };
 
   const setState = (message, playing = false) => {
     status.textContent = message;
@@ -19,13 +42,13 @@
     play.querySelector('svg path').setAttribute('d', wantsPlayback ? 'M6 3h4v18H6ZM14 3h4v18h-4Z' : 'M6 3 21 12 6 21Z');
   };
   const updateVolume = () => {
-    const quiet = audio.muted || audio.volume === 0;
-    const percent = Math.round(audio.volume * 100);
+    const quiet = muted || selectedVolume === 0;
+    const percent = Math.round(selectedVolume * 100);
     mute.classList.toggle('is-muted', quiet);
     mute.setAttribute('aria-pressed', String(quiet));
     mute.setAttribute('aria-label', quiet ? 'Unmute demo radio' : 'Mute demo radio');
     volume.value = percent;
-    volume.setAttribute('aria-valuetext', `${percent} percent${audio.muted ? ', muted' : ''}`);
+    volume.setAttribute('aria-valuetext', `${percent} percent${muted ? ', muted' : ''}`);
     document.querySelector('#radio-volume-value').textContent = quiet ? 'OFF' : `${percent}%`;
     player.classList.toggle('is-muted', quiet);
   };
@@ -50,7 +73,8 @@
     wantsPlayback = true;
     setState('Loading demo…');
     try {
-      await audio.play();
+      // Resume the context and start media within the same user gesture.
+      await Promise.all([prepareOutput(), audio.play()]);
     } catch (error) {
       if (currentRequest !== request) return;
       wantsPlayback = false;
@@ -86,25 +110,26 @@
   audio.addEventListener('waiting', () => { if (wantsPlayback) setState('Buffering…'); });
   audio.addEventListener('ended', () => { if (wantsPlayback) advance(true); });
   audio.addEventListener('error', reportError);
-  audio.addEventListener('volumechange', updateVolume);
   volume.addEventListener('input', () => {
-    audio.volume = Number(volume.value) / 100;
-    if (audio.volume > 0) previousVolume = audio.volume;
-    audio.muted = false;
+    selectedVolume = Number(volume.value) / 100;
+    if (selectedVolume > 0) previousVolume = selectedVolume;
+    muted = false;
+    applyVolume();
     updateVolume();
   });
   mute.addEventListener('click', () => {
-    if (audio.muted || audio.volume === 0) {
-      if (audio.volume === 0) audio.volume = previousVolume || RADIO_CONFIG.initialVolume;
-      audio.muted = false;
-    } else audio.muted = true;
+    if (muted || selectedVolume === 0) {
+      if (selectedVolume === 0) selectedVolume = previousVolume || RADIO_CONFIG.initialVolume;
+      muted = false;
+    } else muted = true;
+    applyVolume();
     updateVolume();
   });
   // Reserve the sticky bar's real height for anchors, including enlarged text.
   new ResizeObserver(() => {
     document.documentElement.style.setProperty('--radio-height', `${player.offsetHeight}px`);
   }).observe(player);
-  audio.volume = RADIO_CONFIG.initialVolume;
+  applyVolume();
   loadTrack();
   updateVolume();
 })();

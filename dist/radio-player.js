@@ -16,7 +16,7 @@
     player.classList.toggle('is-playing', playing);
     play.setAttribute('aria-pressed', String(wantsPlayback));
     play.setAttribute('aria-label', wantsPlayback ? 'Pause demo radio' : failed ? 'Retry demo radio' : 'Play demo radio');
-    play.firstElementChild.textContent = wantsPlayback ? 'Ⅱ' : '▶';
+    play.querySelector('svg path').setAttribute('d', wantsPlayback ? 'M6 3h4v18H6ZM14 3h4v18h-4Z' : 'M6 3 21 12 6 21Z');
   };
   const updateVolume = () => {
     const quiet = audio.muted || audio.volume === 0;

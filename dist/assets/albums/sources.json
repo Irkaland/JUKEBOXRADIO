@@ -25,5 +25,32 @@
       1200,
       1200
     ]
+  },
+  {
+    "file": "aquemini.jpg",
+    "source": "https://music.apple.com/us/album/aquemini/1536669507",
+    "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/0e/48/dd/0e48dd9a-07c9-46de-a838-b4ddb4e508a7/886448814191.jpg/1200x1200bb.jpg",
+    "size": [
+      1200,
+      1200
+    ]
+  },
+  {
+    "file": "demon-days.jpg",
+    "source": "https://music.apple.com/us/album/demon-days/850571319",
+    "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/1c/0f/81/1c0f818a-e458-dd84-6f1b-ccbdf5fe14d6/825646291045.jpg/1200x1200bb.jpg",
+    "size": [
+      1200,
+      1200
+    ]
+  },
+  {
+    "file": "fly-or-die.jpg",
+    "source": "https://music.apple.com/us/album/fly-or-die/712730248",
+    "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/a5/f8/da/a5f8da95-3f83-f726-a2d8-ac3b02e625cb/13UABIM53406.rgb.jpg/1200x1200bb.jpg",
+    "size": [
+      1200,
+      1200
+    ]
   }
 ]

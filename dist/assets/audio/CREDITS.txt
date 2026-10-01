@@ -1,0 +1,5 @@
+JUKEBOX demo instrumentals: City Signal, Paper Sun, Afterglow.
+Generated for this prototype using original oscillator synthesis and procedural percussion.
+No external recordings, commercial music, or third-party audio samples were used.
+These are illustrative 20-second instrumentals, not a live broadcast or recordings
+by the artists whose reference sleeves appear in the design.

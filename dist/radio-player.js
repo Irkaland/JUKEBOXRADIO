@@ -2,24 +2,15 @@
   const player = document.querySelector('.radio-player');
   const audio = document.querySelector('#radio-audio');
   const play = document.querySelector('#radio-play');
-  const next = document.querySelector('#radio-next');
   const mute = document.querySelector('#radio-mute');
   const volume = document.querySelector('#radio-volume');
   const status = document.querySelector('#radio-status');
-  const time = document.querySelector('#radio-time');
   let active = 0;
   let request = 0;
   let wantsPlayback = false;
   let failed = false;
   let previousVolume = RADIO_CONFIG.initialVolume;
 
-  const formatTime = (seconds) => {
-    const value = Math.max(0, Math.floor(Number.isFinite(seconds) ? seconds : 0));
-    return `${Math.floor(value / 60)}:${String(value % 60).padStart(2, '0')}`;
-  };
-  const updateTime = () => {
-    time.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration || RADIO_PLAYLIST[active].duration)}`;
-  };
   const setState = (message, playing = false) => {
     status.textContent = message;
     player.classList.toggle('is-playing', playing);
@@ -48,7 +39,6 @@
     art.style.backgroundPosition = `${item.artwork.x * 0.34}px ${item.artwork.y * 0.34}px`;
     art.setAttribute('aria-label', item.artwork.label);
     failed = false;
-    updateTime();
   };
   const reportError = () => {
     failed = true;
@@ -89,16 +79,13 @@
       start();
     }
   });
-  next.addEventListener('click', () => advance(wantsPlayback));
   audio.addEventListener('playing', () => { wantsPlayback = true; setState('Playing demo', true); });
   audio.addEventListener('pause', () => {
     if (!audio.ended && !failed) { wantsPlayback = false; setState('Paused'); }
   });
   audio.addEventListener('waiting', () => { if (wantsPlayback) setState('Buffering…'); });
-  audio.addEventListener('ended', () => advance(true));
+  audio.addEventListener('ended', () => { if (wantsPlayback) advance(true); });
   audio.addEventListener('error', reportError);
-  audio.addEventListener('timeupdate', updateTime);
-  audio.addEventListener('loadedmetadata', updateTime);
   audio.addEventListener('volumechange', updateVolume);
   volume.addEventListener('input', () => {
     audio.volume = Number(volume.value) / 100;
